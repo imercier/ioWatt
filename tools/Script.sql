@@ -26,7 +26,7 @@ order by currentday;
 
 SELECT * FROM EnergyHistory ORDER BY timestamp DESC LIMIT 10;
 
-SELECT count(*) 
+SELECT count(*)
 FROM EnergyHistory
 where
 isvalid is false
