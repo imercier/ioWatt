@@ -19,7 +19,7 @@ print((
 
 tz = timezone('Europe/Paris')
 start_date = date(2021, 1, 1)
-end_date = date(2021, 1, 5)
+end_date = date(2021, 12, 31)
 delta = timedelta(days=1)
 sunList = []
 while start_date <= end_date:
