@@ -59,23 +59,22 @@ ROUND((sum(energyProduced) * 0.00017) /
 (select count(distinct(DATE_TRUNC('day',timestamp))) from EnergyHistory where  energyProduced > 0), 1)
 FROM energyhistory
 
-SELECT count(*)
-FROM EnergyHistory
-where
-isvalid is false
-AND (extract('hour' from timestamp) >= 7 AND extract('hour' from timestamp) < 21);
-
 
 select * 
-FROM energyhistory;
-
-select count(*) 
 FROM energyhistory
-where energyProduced = 0
-and now() > (SELECT sunrise AT TIME ZONE 'Europe/Paris' FROM sunephemeride WHERE day = current_date)
-and now() < (SELECT sunset AT TIME ZONE 'Europe/Paris' FROM sunephemeride WHERE day = current_date)
-and current_date = (SELECT "day" AT TIME ZONE 'Europe/Paris' FROM sunephemeride);
+order by "timestamp" desc
+limit 10;
 
+select
+	count(*) 
+FROM energyhistory
+where
+	energyProduced = 0 and
+	"timestamp" AT TIME ZONE 'Europe/Paris'  > (SELECT sunrise at time zone 'utc' + interval '30' minute FROM sunephemeride WHERE day = current_date) and
+	"timestamp" AT TIME ZONE 'Europe/Paris'  < (SELECT sunset at time zone 'utc' - interval '1' hour FROM sunephemeride WHERE day = current_date);
+
+SELECT sunrise at time zone 'utc' + interval '30' minute FROM sunephemeride WHERE day = current_date;
+SELECT sunset at time zone 'utc' - interval '1' hour FROM sunephemeride WHERE day = current_date;
 
 select count(*) 
 FROM energyhistory
