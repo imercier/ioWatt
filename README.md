@@ -2,5 +2,7 @@
 
 ![architecture](docs/ioWatt.png)
 
-![dashboard](docs/screen.png)
+![Production Dashboard](docs/screen.png)
+![Meteo Dashboard](docs/meteo.png)
+![Cash Dashboard](docs/cash.png)
 
