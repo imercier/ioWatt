@@ -4,6 +4,7 @@ from os import environ
 from json import loads
 import logging
 from re import finditer, MULTILINE
+import sys
 
 pgHost = environ['PG_HOST']
 pgDatabase = environ['PG_DB']
@@ -23,9 +24,10 @@ def lambda_handler(event, context):
         data = loads(match.group(1))
         break
     # transform list of list to list of tuple
-    radiation = [tuple(x) for x in data['srad']]
-    pression = [tuple(x) for x in data['slp']]
-    temperature = [tuple(x) for x in data['temperature']]
+    #print(data['slp'][162])
+    pression = [tuple(x) for x in data['slp'] if isinstance(x, list)]
+    radiation = [tuple(x) for x in data['srad']  if isinstance(x, list)]
+    temperature = [tuple(x) for x in data['temperature']  if isinstance(x, list)]
 
     conn = None
     sqlRadiation = """INSERT INTO radiation
@@ -71,4 +73,6 @@ def lambda_handler(event, context):
 
 
 if __name__ == "__main__":
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
     lambda_handler(None, None)
