@@ -12,14 +12,15 @@ logging.basicConfig(level=logging.INFO)
 endpoint = 'https://monitoringapi.solaredge.com'
 api_key = environ['SOLAREDGE_API_KEY']
 site_id = environ['SOLAREDGE_SITE_ID']
-inverter_serial = environ['SOLAREDGE_INVERTER_SERIAL']
 
 now = datetime.now(timezone('Europe/Paris'))
-start = now - timedelta(hours=24)
+start = now - timedelta(days=1)
+end = now - timedelta(days=0)
 startTime = start.strftime("%Y-%m-%d %H:%M:%S")
-endTime = now.strftime("%Y-%m-%d %H:%M:%S")
+endTime = end.strftime("%Y-%m-%d %H:%M:%S")
 
 
+inverter_serial = environ['SOLAREDGE_INVERTER_SERIAL']
 req = endpoint + \
     '/equipment/' + \
     site_id + '/' + \
@@ -31,6 +32,19 @@ req = endpoint + \
 resp = requests.get(req)
 if resp.status_code == 200:
     resp = requests.get(req).json()
+    print(json.dumps(resp))
+else:
+    print(resp)
+"""
+req = endpoint + \
+      '/site/' + site_id + \
+      '/power?' + \
+      'startTime=' + urllib.parse.quote(startTime) + \
+      '&endTime=' + urllib.parse.quote(endTime) + \
+      '&api_key=' + api_key
+resp = requests.get(req)
+if resp.status_code == 200:
+    resp = requests.get(req).json()['power']['values']
     print(json.dumps(resp))
 else:
     print(resp)
@@ -46,16 +60,5 @@ if resp.status_code == 200:
     print(json.dumps(resp))
 else:
     print(resp)
-
-req = endpoint + \
-      '/site/' + site_id + \
-      '/power?' + \
-      'startTime=' + urllib.parse.quote(startTime) + \
-      '&endTime=' + urllib.parse.quote(endTime) + \
-      '&api_key=' + api_key
-resp = requests.get(req)
-if resp.status_code == 200:
-    resp = requests.get(req).json()['power']['values']
-    print(resp)
-else:
-    print(resp)
+exit()
+"""
