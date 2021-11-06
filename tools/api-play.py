@@ -17,7 +17,9 @@ now = datetime.now(timezone('Europe/Paris'))
 start = now - timedelta(days=1)
 end = now - timedelta(days=0)
 startTime = start.strftime("%Y-%m-%d %H:%M:%S")
+startTime = start.strftime("2021-10-28 00:00:00")
 endTime = end.strftime("%Y-%m-%d %H:%M:%S")
+endTime = start.strftime("2021-10-30 00:00:00")
 
 
 inverter_serial = environ['SOLAREDGE_INVERTER_SERIAL']

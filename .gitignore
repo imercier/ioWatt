@@ -1,2 +1,7 @@
 package/
 *.zip
+lambda/terraform/.terraform
+lambda/terraform/.terraform
+lambda/terraform/terraform.tfstate
+lambda/terraform/terraform.tfstate.backup
+lambda/terraform/.terraform.lock.hcl
