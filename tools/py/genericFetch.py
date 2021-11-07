@@ -1,7 +1,6 @@
 from requests import get
 from datetime import datetime, timedelta
 import time
-from pytz import timezone
 from urllib.parse import quote
 from psycopg2 import connect
 from os import environ
@@ -72,7 +71,8 @@ def dataDbSave(cur, execTime, label, data):
     if data is not None:
         sql = """INSERT INTO ioWatt
         (siteId, execTime, label, apiVersion, data) VALUES (%s, %s, %s, %s, %s)
-        ON CONFLICT DO NOTHING;"""
+        ON CONFLICT (siteId, label, datatime)
+        DO UPDATE SET exectime = %s, data = %s;"""
         logging.info("Inserting %d measures for label: %s", len(data), label)
         try:
             for d in data:
@@ -82,12 +82,17 @@ def dataDbSave(cur, execTime, label, data):
                              execTime,
                              label,
                              "unknow",
+                             dumps(d),
+                             execTime,
                              dumps(d)))
         except (Exception) as error:
             logging.error(error)
 
 
-def lambda_handler(event, context):
+def process(start, end):
+    startTime = start.strftime("%Y-%m-%d %H:%M:%S")
+    endTime = end.strftime("%Y-%m-%d %H:%M:%S")
+    logging.info("Req: startTime: %s endTime: %s" % (startTime, endTime))
     try:
         conn = connect(
             host=pgHost,
@@ -95,37 +100,35 @@ def lambda_handler(event, context):
             user=pgUser,
             password=pgPassword)
         cur = conn.cursor()
-        now = datetime.now(timezone('Europe/Paris'))
-        start = now - timedelta(weeks=2)
-        startTime = start.strftime("%Y-%m-%d %H:%M:%S")
-        end = now - timedelta(weeks=1)
-        endTime = end.strftime("%Y-%m-%d %H:%M:%S")
-        logging.info("Req: startTime: %s endTime: %s" % (startTime, endTime))
-        execTime = time.strftime('%Y-%m-%d %H:%M:%S')
-        dataDbSave(cur,
-                   execTime,
-                   "equipment_inverter",
-                   equipmentFetch(startTime, endTime))
-        execTime = time.strftime('%Y-%m-%d %H:%M:%S')
+        execTime = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         dataDbSave(cur,
                    execTime,
                    "power",
                    powerFetch(startTime, endTime))
-        execTime = time.strftime('%Y-%m-%d %H:%M:%S')
+        execTime = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        dataDbSave(cur,
+                   execTime,
+                   "equipment_inverter",
+                   equipmentFetch(startTime, endTime))
+        execTime = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         dataDbSave(cur,
                    execTime,
                    "energy",
                    energyFetch(startTime, endTime))
     except (Exception) as error:
         logging.error(error)
-        if conn is not None:
-            conn.rollback()
     else:
         conn.commit()
-    finally:
-        if conn is not None:
-            conn.close()
+        conn.close()
 
 
 if __name__ == "__main__":
-    lambda_handler(None, None)
+    start = datetime(2021, 4, 1)
+    now = datetime.today()
+    end = datetime(1900, 1, 1)
+    while end != now:
+        end = start + timedelta(weeks=1)
+        if end > now:
+            end = now
+        process(start, end)
+        start += timedelta(weeks=1)

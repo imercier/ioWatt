@@ -8,54 +8,65 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "editable": true,
+  "fiscalYearStartMonth": 0,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 9,
+  "id": 25,
   "links": [],
+  "liveNow": true,
   "panels": [
     {
-      "datasource": "pg@aws",
+      "datasource": "pg_iowat",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-BlYlRd"
           },
           "custom": {
+            "axisGridShow": true,
             "axisLabel": "",
             "axisPlacement": "auto",
-            "barAlignment": 1,
-            "drawStyle": "bars",
-            "fillOpacity": 36,
-            "gradientMode": "hue",
+            "barAlignment": -1,
+            "drawStyle": "line",
+            "fillOpacity": 60,
+            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "stepAfter",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
-            "pointSize": 7,
+            "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
-            "spanNulls": false,
+            "showPoints": "never",
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "off"
             }
           },
+          "displayName": "Energy",
           "mappings": [],
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
               {
                 "color": "green",
@@ -63,7 +74,7 @@
               }
             ]
           },
-          "unit": "%"
+          "unit": "watth"
         },
         "overrides": []
       },
@@ -73,7 +84,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 11,
+      "id": 2,
       "options": {
         "legend": {
           "calcs": [],
@@ -86,63 +97,12 @@
       },
       "targets": [
         {
-          "format": "table",
-          "group": [
-            {
-              "params": [
-                "1d",
-                "none"
-              ],
-              "type": "time"
-            }
-          ],
-          "hide": true,
-          "metricColumn": "none",
-          "queryType": "randomWalk",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  $__timeGroupAlias(\"timestamp\",1d),\n  sum(energyProduced) AS \"energyProduced\"\nFROM energyhistory\nWHERE\n  $__timeFilter(\"timestamp\")\nGROUP BY 1;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "energyProduced"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "sum"
-                ],
-                "type": "aggregate"
-              },
-              {
-                "params": [
-                  "energyProduced"
-                ],
-                "type": "alias"
-              }
-            ]
-          ],
-          "table": "energyhistory",
-          "timeColumn": "\"timestamp\"",
-          "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
-        },
-        {
           "format": "time_series",
           "group": [],
-          "hide": true,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "select \n  $__timeGroupAlias(\"timestamp\",1d),\n  round(0.1972 * 21 * 1.66 * sum(radiation) * 0.5) as \"Theorical Total Energy (W.h)\"\nfrom radiation\nWHERE\n  $__timeFilter(\"timestamp\")\nGROUP BY 1;",
-          "refId": "B",
+          "rawSql": "SELECT\n  datatime AT TIME ZONE 'Europe/Paris' AS \"time\",\n  (data->'value')::numeric as energy\nFROM\n  iowatt\nWHERE\n  $__timeFilter(datatime)\n  and label = 'energy'\n  and siteid = 1723771",
+          "refId": "A",
           "select": [
             [
               {
@@ -161,57 +121,53 @@
               "type": "macro"
             }
           ]
-        },
-        {
-          "datasource": "__expr__",
-          "expression": "$A / $B * 100",
-          "hide": false,
-          "refId": "C",
-          "type": "math"
         }
       ],
-      "title": "Efficiency",
+      "title": "Deviation Production (15 min average)",
       "transparent": true,
       "type": "timeseries"
     },
     {
-      "datasource": "pg@aws",
+      "datasource": "pg_iowat",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-BlYlRd"
           },
           "custom": {
+            "axisGridShow": true,
             "axisLabel": "",
             "axisPlacement": "auto",
-            "barAlignment": 1,
-            "drawStyle": "bars",
-            "fillOpacity": 18,
-            "gradientMode": "hue",
+            "barAlignment": -1,
+            "drawStyle": "line",
+            "fillOpacity": 60,
+            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
-            "pointSize": 7,
+            "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
-            "spanNulls": false,
+            "showPoints": "never",
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "line"
+              "mode": "off"
             }
           },
+          "displayName": "Energy",
           "mappings": [],
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
               {
                 "color": "green",
@@ -229,7 +185,7 @@
         "x": 0,
         "y": 8
       },
-      "id": 6,
+      "id": 3,
       "options": {
         "legend": {
           "calcs": [],
@@ -242,62 +198,12 @@
       },
       "targets": [
         {
-          "format": "table",
-          "group": [
-            {
-              "params": [
-                "1d",
-                "none"
-              ],
-              "type": "time"
-            }
-          ],
-          "metricColumn": "none",
-          "queryType": "randomWalk",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  $__timeGroupAlias(\"timestamp\",1d),\n  sum(energyProduced) AS \"energyProduced\"\nFROM energyhistory\nWHERE\n  $__timeFilter(\"timestamp\")\nGROUP BY 1",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "energyProduced"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "sum"
-                ],
-                "type": "aggregate"
-              },
-              {
-                "params": [
-                  "energyProduced"
-                ],
-                "type": "alias"
-              }
-            ]
-          ],
-          "table": "energyhistory",
-          "timeColumn": "\"timestamp\"",
-          "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
-        },
-        {
           "format": "time_series",
           "group": [],
-          "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "select \n  $__timeGroupAlias(\"timestamp\",1d),\n  round(0.1972 * 21 * 1.66 * sum(radiation) * 0.5) as \"Theorical Total Energy (W.h)\"\nfrom radiation\nWHERE\n  $__timeFilter(\"timestamp\")\nGROUP BY 1;",
-          "refId": "B",
+          "rawSql": "SELECT\n  datatime AT TIME ZONE 'Europe/Paris' AS \"time\",\n  (data->'value')::numeric as energy\nFROM\n  iowatt\nWHERE\n  $__timeFilter(datatime)\n  and label = 'energy'\n  and siteid = 2168697",
+          "refId": "A",
           "select": [
             [
               {
@@ -318,7 +224,7 @@
           ]
         }
       ],
-      "title": "Daily Produced Energy",
+      "title": "Boris Production (15 min average)",
       "transparent": true,
       "type": "timeseries"
     },
@@ -327,13 +233,13 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-YlBl"
           },
           "custom": {
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": -1,
-            "drawStyle": "bars",
+            "drawStyle": "line",
             "fillOpacity": 55,
             "gradientMode": "opacity",
             "hideFrom": {
@@ -341,7 +247,7 @@
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -362,105 +268,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "watth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 14,
-        "w": 24,
-        "x": 0,
-        "y": 16
-      },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "format": "table",
-          "group": [],
-          "metricColumn": "none",
-          "queryType": "randomWalk",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  timestamp AT TIME ZONE 'Europe/Paris' AS \"time\",\n  energyProduced\nFROM energyhistory\nORDER BY 1",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "energyProduced"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "energyhistory",
-          "timeColumn": "timestamp",
-          "timeColumnType": "timestamp",
-          "where": []
-        }
-      ],
-      "title": "Energy Produced last 15minutes",
-      "type": "timeseries"
-    },
-    {
-      "datasource": "pg@aws",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": -1,
-            "drawStyle": "bars",
-            "fillOpacity": 55,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
+                "color": "yellow",
                 "value": null
               }
             ]
@@ -470,12 +278,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 13,
+        "h": 7,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 16
       },
-      "id": 2,
+      "id": 5,
       "options": {
         "legend": {
           "calcs": [],
@@ -513,153 +321,10 @@
       ],
       "title": "Sun Radiation (30min average)",
       "type": "timeseries"
-    },
-    {
-      "alert": {
-        "alertRuleTags": {},
-        "conditions": [
-          {
-            "evaluator": {
-              "params": [
-                0
-              ],
-              "type": "gt"
-            },
-            "operator": {
-              "type": "and"
-            },
-            "query": {
-              "params": [
-                "A",
-                "5m",
-                "now"
-              ]
-            },
-            "reducer": {
-              "params": [],
-              "type": "avg"
-            },
-            "type": "query"
-          }
-        ],
-        "executionErrorState": "alerting",
-        "for": "1h",
-        "frequency": "1m",
-        "handler": 1,
-        "message": "alarmmmmmmm!!!",
-        "name": "Energy Produced Alert alert",
-        "noDataState": "no_data",
-        "notifications": []
-      },
-      "datasource": "pg@aws",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": -1,
-            "drawStyle": "points",
-            "fillOpacity": 55,
-            "gradientMode": "opacity",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 14,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 17,
-        "w": 24,
-        "x": 0,
-        "y": 43
-      },
-      "id": 8,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "pluginVersion": "8.0.3",
-      "targets": [
-        {
-          "format": "table",
-          "group": [],
-          "metricColumn": "none",
-          "queryType": "randomWalk",
-          "rawQuery": true,
-          "rawSql": "select\n\tcount(*),\n\ttimestamp as \"time\"\nFROM energyhistory\nwhere\n\tenergyProduced = 0 and\n\t\"timestamp\" AT TIME ZONE 'Europe/Paris'  > (SELECT sunrise at time zone 'utc' + interval '30' minute FROM sunephemeride WHERE day = current_date) and\n\t\"timestamp\" AT TIME ZONE 'Europe/Paris'  < (SELECT sunset at time zone 'utc' - interval '1' hour FROM sunephemeride WHERE day = current_date)\n\tgroup by time;",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "energyProduced"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "energyhistory",
-          "timeColumn": "timestamp",
-          "timeColumnType": "timestamp",
-          "where": []
-        }
-      ],
-      "thresholds": [
-        {
-          "colorMode": "critical",
-          "op": "gt",
-          "value": 0,
-          "visible": true
-        }
-      ],
-      "title": "Energy Produced Alert",
-      "type": "timeseries"
     }
   ],
   "refresh": "",
-  "schemaVersion": 30,
+  "schemaVersion": 31,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -672,6 +337,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Production",
-  "uid": "e71MJLgnz",
-  "version": 28
+  "uid": "a_DfheK7z",
+  "version": 19
 }
