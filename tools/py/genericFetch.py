@@ -1,6 +1,6 @@
 from requests import get
-from datetime import datetime, timedelta
 import time
+from datetime import datetime, timedelta
 from urllib.parse import quote
 from psycopg2 import connect
 from os import environ
@@ -69,7 +69,7 @@ def energyFetch(startTime, endTime):
 
 def dataDbSave(cur, execTime, label, data):
     if data is not None:
-        sql = """INSERT INTO ioWatt
+        sql = """INSERT INTO ioWatt_utc
         (siteId, execTime, label, apiVersion, data) VALUES (%s, %s, %s, %s, %s)
         ON CONFLICT (siteId, label, datatime)
         DO UPDATE SET exectime = %s, data = %s;"""
@@ -100,9 +100,8 @@ def process(start, end):
             user=pgUser,
             password=pgPassword)
         cur = conn.cursor()
-        execTime = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         dataDbSave(cur,
-                   execTime,
+                   time.strftime('%Y-%m-%d %H:%M:%S'),
                    "power",
                    powerFetch(startTime, endTime))
         execTime = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
@@ -123,7 +122,7 @@ def process(start, end):
 
 
 if __name__ == "__main__":
-    start = datetime(2021, 4, 1)
+    start = datetime(2021, 11, 9)
     now = datetime.today()
     end = datetime(1900, 1, 1)
     while end != now:

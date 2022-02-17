@@ -8,19 +8,14 @@ GRANT ALL PRIVILEGES on iowatt to writer;
 
 CREATE USER reader WITH PASSWORD 'kHhzzQmqKn';
 grant select on iowatt to reader;
+grant select on iowatt_utc to reader;
+grant select on schema public to reader;
+GRANT USAGE ON SCHEMA schema_name TO username;
+
 GRANT CONNECT ON DATABASE postgres TO reader;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO reader;
 
 
-CREATE USER test WITH PASSWORD 'camarche';
-grant insert, update on iowatt to test;
-GRANT CONNECT ON DATABASE postgres TO test;
-revoke USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO test;
-REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM test;
-REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM test;
-REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM test;
-SELECT grantor, grantee, table_schema, table_name, privilege_type FROM information_schema.table_privileges
-where grantee = 'test';
 
 REVOKE TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA public FROM test;
 DROP USER test CASCADE;
